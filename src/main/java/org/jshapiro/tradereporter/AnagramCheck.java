@@ -1,9 +1,12 @@
 package org.jshapiro.tradereporter;
 
+import org.springframework.stereotype.Component;
+
 import java.util.Arrays;
 
+@Component
 public class AnagramCheck {
-    public static boolean isAnagram(String a, String b) {
+    public boolean isAnagram(String a, String b) {
         if (a == null || b == null) {
             return false;
         }
