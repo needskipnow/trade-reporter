@@ -2,6 +2,7 @@ package org.jshapiro.tradereporter.repository;
 
 import org.jshapiro.tradereporter.model.Currency;
 import org.jshapiro.tradereporter.model.TradeSummary;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -15,6 +16,11 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest
 class TradeSummaryRepositoryTest {
     @Autowired TradeSummaryRepository repository;
+
+    @AfterEach
+    public void cleanUp() {
+        repository.deleteAll();
+    }
 
     @Test
     void testCrudOperations() {

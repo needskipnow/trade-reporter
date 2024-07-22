@@ -1,7 +1,6 @@
 package org.jshapiro.tradereporter;
 
 import lombok.SneakyThrows;
-import lombok.val;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
@@ -17,21 +16,14 @@ public class XmlUtils {
     public static final DocumentBuilderFactory DOCUMENT_BUILDER_FACTORY;
     static {
         DOCUMENT_BUILDER_FACTORY = DocumentBuilderFactory.newInstance();
-        DOCUMENT_BUILDER_FACTORY.setNamespaceAware(true);
     }
     public static final XPathFactory XPATH_FACTORY = XPathFactory.newDefaultInstance();
-
-    private static Document buildDocument(InputSource inputSource)
-            throws Exception {
-        DocumentBuilder docBuilder = getDocumentBuilder();
-        return docBuilder.parse(inputSource);
-    }
 
     @SneakyThrows
     public static Document buildDocument(final String xml) {
         DocumentBuilder builder = getDocumentBuilder();
         Reader reader = new StringReader(xml);
-        val result = builder.parse(new InputSource(reader));
+        Document result = builder.parse(new InputSource(reader));
         IOUtils.closeQuietly(reader);
         return result;
     }

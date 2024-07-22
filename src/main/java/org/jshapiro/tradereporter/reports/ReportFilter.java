@@ -2,7 +2,7 @@ package org.jshapiro.tradereporter.reports;
 
 import org.jshapiro.tradereporter.AnagramCheck;
 import org.jshapiro.tradereporter.model.Currency;
-import org.jshapiro.tradereporter.model.TradeSummary;
+import org.jshapiro.tradereporter.model.TradeDigest;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Component;
 
@@ -20,10 +20,10 @@ public class ReportFilter {
         this.anagramChecker = anagramChecker;
     }
 
-    public boolean isReportable(TradeSummary trade) {
-        if (trade == null || anagramChecker.isAnagram(trade.getBuyerParty(), trade.getSellerParty())) {
+    public boolean isReportable(TradeDigest trade) {
+        if (trade == null || anagramChecker.isAnagram(trade.buyerParty(), trade.sellerParty())) {
             return false;
         }
-        return REPORTABLE_SALES.contains(Pair.of(trade.getSellerParty(), trade.getCurrency()));
+        return REPORTABLE_SALES.contains(Pair.of(trade.sellerParty(), trade.currency()));
     }
 }

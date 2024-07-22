@@ -24,7 +24,7 @@ class ReportFilterTest {
                     .sellerParty(sellerPartyCurrencyPair.getFirst())
                     .currency(sellerPartyCurrencyPair.getSecond())
                     .build();
-            assertTrue(reportFilter.isReportable(summary));
+            assertTrue(reportFilter.isReportable(summary.toTradeDigest()));
         });
     }
 
@@ -36,7 +36,7 @@ class ReportFilterTest {
                     .sellerParty(sellerPartyCurrencyPair.getFirst())
                     .currency(Currency.JPY)
                     .build();
-            assertFalse(reportFilter.isReportable(summary));
+            assertFalse(reportFilter.isReportable(summary.toTradeDigest()));
         });
 
         TradeSummary summary = TradeSummary.builder()
@@ -44,6 +44,6 @@ class ReportFilterTest {
                 .sellerParty("bar")
                 .currency(Currency.USD)
                 .build();
-        assertFalse(reportFilter.isReportable(summary));
+        assertFalse(reportFilter.isReportable(summary.toTradeDigest()));
     }
 }

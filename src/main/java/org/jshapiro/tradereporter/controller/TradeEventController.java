@@ -2,6 +2,7 @@ package org.jshapiro.tradereporter.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.jshapiro.tradereporter.XmlUtils;
+import org.jshapiro.tradereporter.model.TradeDigest;
 import org.jshapiro.tradereporter.model.TradePayload;
 import org.jshapiro.tradereporter.model.TradeSummary;
 import org.jshapiro.tradereporter.reports.ReportFilter;
@@ -15,7 +16,6 @@ import org.w3c.dom.Document;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.jshapiro.tradereporter.XmlUtils.XPATH_FACTORY;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.http.MediaType.APPLICATION_XML_VALUE;
 
@@ -29,18 +29,19 @@ public class TradeEventController {
 
     @PostMapping(path = "/events", consumes = APPLICATION_XML_VALUE, produces = APPLICATION_JSON_VALUE)
     @ResponseBody
-    public List<TradeSummary> processEvents(List<String> events) {
+    public List<TradeDigest> processEvents(List<String> events) {
         return events.parallelStream()
                 .map(this::processEvent)
                 .filter(reportFilter::isReportable)
                 .collect(Collectors.toList());
     }
 
-    protected TradeSummary processEvent(String eventXmlString) {
+    protected TradeDigest processEvent(String eventXmlString) {
         Document event = XmlUtils.buildDocument(eventXmlString);
 
-        TradePayload tradePayload = new TradePayload(event, XPATH_FACTORY.newXPath());
+        TradePayload tradePayload = new TradePayload(event);
         TradeSummary tradeSummary = tradePayload.tradeSummary();
-        return repository.save(tradeSummary);
+        repository.save(tradeSummary);
+        return tradeSummary.toTradeDigest();
     }
 }
