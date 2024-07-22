@@ -1,6 +1,5 @@
 package org.jshapiro.tradereporter.reports;
 
-import lombok.RequiredArgsConstructor;
 import org.jshapiro.tradereporter.AnagramCheck;
 import org.jshapiro.tradereporter.model.Currency;
 import org.jshapiro.tradereporter.model.TradeSummary;
@@ -11,20 +10,20 @@ import java.util.Set;
 
 @Component
 public class ReportFilter {
-    private static final Set<Pair<String, Currency>> REPORTABLE_SALES = Set.of(
+    protected static final Set<Pair<String, Currency>> REPORTABLE_SALES = Set.of(
             Pair.of("EMU_BANK", Currency.AUD),
             Pair.of("BISON_BANK", Currency.USD));
 
-    private AnagramCheck anagramChecker;
+    private final AnagramCheck anagramChecker;
 
     public ReportFilter(AnagramCheck anagramChecker) {
         this.anagramChecker = anagramChecker;
     }
 
     public boolean isReportable(TradeSummary trade) {
-        if (trade == null || anagramChecker.isAnagram(trade.buyerParty(), trade.sellerParty())) {
+        if (trade == null || anagramChecker.isAnagram(trade.getBuyerParty(), trade.getSellerParty())) {
             return false;
         }
-        return REPORTABLE_SALES.contains(Pair.of(trade.sellerParty(), trade.currency()));
+        return REPORTABLE_SALES.contains(Pair.of(trade.getSellerParty(), trade.getCurrency()));
     }
 }

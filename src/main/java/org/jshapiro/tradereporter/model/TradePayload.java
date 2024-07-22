@@ -12,10 +12,10 @@ import java.time.LocalDate;
 import java.util.Objects;
 
 public record TradePayload (Document document, XPath xpath) {
-    static final String SELLER_PARTY_XPATH = "//sellerPartyReference/@href";
-    static final String BUYER_PARTY_XPATH = "//buyerPartyReference/@href";
-    static final String CURRENCY = "//paymentAmount/currency";
-    static final String AMOUNT = "//paymentAmount/amount";
+    private static final String SELLER_PARTY_XPATH = "//sellerPartyReference/@href";
+    private static final String BUYER_PARTY_XPATH = "//buyerPartyReference/@href";
+    private static final String CURRENCY = "//paymentAmount/currency";
+    private static final String AMOUNT = "//paymentAmount/amount";
     private static final String TRADE_DATE ="//tradeDate" ;
     private static final String CREATED_ON_TIMESTAMP = "//createdOnTimestamp";
 
