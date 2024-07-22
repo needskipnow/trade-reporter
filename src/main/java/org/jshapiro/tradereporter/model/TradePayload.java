@@ -1,23 +1,40 @@
 package org.jshapiro.tradereporter.model;
 
+import lombok.SneakyThrows;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.util.Objects;
 
-public record TradePayload (Document document, XPath xpath) {
-    private static final String SELLER_PARTY_XPATH = "//sellerPartyReference/@href";
-    private static final String BUYER_PARTY_XPATH = "//buyerPartyReference/@href";
-    private static final String CURRENCY = "//paymentAmount/currency";
-    private static final String AMOUNT = "//paymentAmount/amount";
-    private static final String TRADE_DATE ="//tradeDate" ;
-    private static final String CREATED_ON_TIMESTAMP = "//createdOnTimestamp";
+import static org.jshapiro.tradereporter.XmlUtils.XPATH_FACTORY;
+
+
+public class TradePayload {
+    private static XPath XPATH = XPATH_FACTORY.newXPath();
+    private final XPathExpression SELLER_PARTY_XPATH;
+    private final XPathExpression BUYER_PARTY_XPATH;
+    private final XPathExpression CURRENCY_XPATH;
+    private final XPathExpression AMOUNT_XPATH;
+    private final XPathExpression TRADE_DATE_XPATH;
+
+    private Document document;
+
+    @SneakyThrows
+    public TradePayload(Document payloadXmlDocument) {
+        this.document = payloadXmlDocument;
+        SELLER_PARTY_XPATH = XPATH.compile("//sellerPartyReference/@href");
+        BUYER_PARTY_XPATH = XPATH.compile("//buyerPartyReference/@href");
+        CURRENCY_XPATH = XPATH.compile("//paymentAmount/currency");
+        AMOUNT_XPATH = XPATH.compile("//paymentAmount/amount");
+        TRADE_DATE_XPATH = XPATH.compile("//tradeDate");
+    }
 
     public String sellerParty() {
         return getText(SELLER_PARTY_XPATH);
@@ -28,24 +45,19 @@ public record TradePayload (Document document, XPath xpath) {
     }
 
     public Currency currency() {
-        return Currency.valueOf(getText(CURRENCY));
+        return Currency.valueOf(getText(CURRENCY_XPATH));
     }
 
     public BigDecimal amount() {
-        return new BigDecimal(Objects.requireNonNull(getText(AMOUNT)));
+        return new BigDecimal(Objects.requireNonNull(getText(AMOUNT_XPATH)));
     }
 
     public LocalDate tradeDate() {
-        return LocalDate.parse(Objects.requireNonNull(getText(TRADE_DATE)));
-    }
-
-    public Timestamp createdOnTimestamp() {
-        return Timestamp.valueOf(Objects.requireNonNull(getText(CREATED_ON_TIMESTAMP)));
+        return LocalDate.parse(Objects.requireNonNull(getText(TRADE_DATE_XPATH)));
     }
 
     public TradeSummary tradeSummary() {
         return new TradeSummary(
-                createdOnTimestamp(),
                 tradeDate(),
                 sellerParty(),
                 buyerParty(),
@@ -58,9 +70,9 @@ public record TradePayload (Document document, XPath xpath) {
         return getText(String.format(template, args));
     }
 
-    public String getText(final String xpath) {
+    public String getText(final XPathExpression xpath) {
         try {
-            final Node node = (Node) this.xpath.compile(xpath).evaluate(document, XPathConstants.NODE);
+            final Node node = (Node) xpath.evaluate(document, XPathConstants.NODE);
 
             if (null != node) {
                 return node.getTextContent();
