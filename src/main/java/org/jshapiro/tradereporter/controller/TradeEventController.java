@@ -41,7 +41,7 @@ public class TradeEventController {
 
         TradePayload tradePayload = new TradePayload(event);
         TradeSummary tradeSummary = tradePayload.tradeSummary();
-        repository.save(tradeSummary);
+        repository.saveAsync(tradeSummary);
         return tradeSummary.toTradeDigest();
     }
 }

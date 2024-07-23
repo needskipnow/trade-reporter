@@ -10,6 +10,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -48,6 +50,29 @@ class TradeSummaryRepositoryTest {
         repository.delete(tradeSummaryStored);
         tradeSummaries = repository.findAll();
         assertTrue(tradeSummaries.isEmpty());
+    }
+
+    @Test
+    void testSaveAsync() throws ExecutionException, InterruptedException {
+        // setup
+        List<TradeSummary> tradeSummaries = repository.findAll();
+        assertTrue(tradeSummaries.isEmpty());
+
+        TradeSummary tradeSummary = TradeSummary.builder()
+                .sellerParty("SELLER")
+                .buyerParty("BUYER")
+                .currency(Currency.AUD)
+                .amount(BigDecimal.valueOf(100).setScale(2, RoundingMode.UP))
+                .build();
+
+        //execute
+        CompletableFuture<TradeSummary> future = repository.saveAsync(tradeSummary);
+        TradeSummary tradeSummaryStored = future.get();
+        assertNotNull(tradeSummaryStored.getId());
+        assertEquals("SELLER", tradeSummaryStored.getSellerParty());
+        assertEquals("BUYER", tradeSummaryStored.getBuyerParty());
+        assertEquals(Currency.AUD, tradeSummaryStored.getCurrency());
+        assertEquals(BigDecimal.valueOf(100).setScale(2, RoundingMode.UP), tradeSummaryStored.getAmount());
     }
 
 }
