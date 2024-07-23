@@ -8,6 +8,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.ResourceLoader;
+import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -18,6 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest
+@Transactional
 class TradeEventControllerTest {
     static final String DIRECTORY_PATH = "classpath:events/";
 
@@ -35,7 +38,7 @@ class TradeEventControllerTest {
 
     @AfterEach
     public void cleanUp() {
-        repository.deleteAll();
+//        repository.deleteAll();
     }
 
     @Test
@@ -48,10 +51,22 @@ class TradeEventControllerTest {
         }
 
         // execute
-        List<TradeDigest> result = controller.processEvents(eventsPayload);
+        ResponseEntity<List<TradeDigest>> result = controller.processEvents(eventsPayload);
 
         //verify
-        assertFalse(result.isEmpty());
-        result.forEach(tradeDigest -> assertTrue(reportFilter.isReportable(tradeDigest)));
+        assertTrue(result.getStatusCode().is2xxSuccessful());
+        assertFalse(result.getBody().isEmpty());
+        result.getBody().forEach(tradeDigest -> assertTrue(reportFilter.isReportable(tradeDigest)));
+    }
+
+    @Test
+    void shouldLoadEvents() throws IOException {
+        // execute
+        ResponseEntity<List<TradeDigest>> result = controller.loadEvents();
+
+        //verify
+        assertTrue(result.getStatusCode().is2xxSuccessful());
+        assertFalse(result.getBody().isEmpty());
+        result.getBody().forEach(tradeDigest -> assertTrue(reportFilter.isReportable(tradeDigest)));
     }
 }

@@ -2,10 +2,10 @@ package org.jshapiro.tradereporter.repository;
 
 import org.jshapiro.tradereporter.model.Currency;
 import org.jshapiro.tradereporter.model.TradeSummary;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -13,16 +13,15 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@SpringBootTest
+@DataJpaTest
+@Transactional
 class TradeSummaryRepositoryTest {
     @Autowired TradeSummaryRepository repository;
-
-    @AfterEach
-    public void cleanUp() {
-        repository.deleteAll();
-    }
 
     @Test
     void testCrudOperations() {
